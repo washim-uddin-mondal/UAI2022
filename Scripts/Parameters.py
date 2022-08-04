@@ -34,4 +34,7 @@ def ParseInput():
     args.eta = 10**-3
     args.hidden_size = 32
 
+    """----------- Training Update Intervals --------- """
+    args.update_interval = 5
+
     return args

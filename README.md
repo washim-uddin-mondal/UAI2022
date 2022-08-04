@@ -46,6 +46,8 @@ percent error for non-linear rewards with non-linearity parameters σ=1.1, 1.2 r
 python3 Main.py
 ```
 
+The progress of the experiment is logged in Results/progress.log
+
 # Command Line Options
 
 Various command line options are given below:

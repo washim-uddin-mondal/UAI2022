@@ -35,6 +35,9 @@ def train(args):
 
     for j in range(args.J):
 
+        if j % args.update_interval == 0:
+            args.logger.info(f'training iteration: {j}')
+
         w = torch.zeros(NumActParam)
         w_avg = torch.zeros(NumActParam)
 

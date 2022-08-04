@@ -4,9 +4,22 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import logging
 
 if __name__ == '__main__':
     args = ParseInput()
+
+    if not os.path.exists('Results'):
+        os.mkdir('Results')
+
+    # Logging
+    args.logFileName = 'Results/progress.log'
+    open(args.logFileName, 'w').close()
+    logging.basicConfig(filename=args.logFileName,
+                        format='%(asctime)s %(message)s',
+                        filemode='w')
+    args.logger = logging.getLogger()
+    args.logger.setLevel(logging.INFO)
 
     t0 = time.time()
 
@@ -23,10 +36,10 @@ if __name__ == '__main__':
     NVec = np.zeros(args.numN)
 
     if args.train:
-        print('Training is in progress.')
+        args.logger.info('Training is in progress.')
         train(args)
 
-    print('Evaluation is in progress.')
+    args.logger.info('Evaluation is in progress.')
     while indexN < args.numN:
         N = args.minN + indexN * args.divN
         NVec[indexN] = N
@@ -49,27 +62,24 @@ if __name__ == '__main__':
             percentRewardErrorArraySD[indexN] += percentRewardError**2/args.maxSeed
 
         indexN += 1
-        print(f'N: {N}')
+        args.logger.info(f'Evaluation N: {N}')
 
     valueRewardMFCArraySD = np.sqrt(np.maximum(0, valueRewardMFCArraySD - valueRewardMFCArray ** 2))
     valueRewardMARLArraySD = np.sqrt(np.maximum(0, valueRewardMARLArraySD - valueRewardMARLArray ** 2))
     percentRewardErrorArraySD = np.sqrt(np.maximum(0, percentRewardErrorArraySD - percentRewardErrorArray ** 2))
 
-    if not os.path.exists('Results'):
-        os.mkdir('Results')
-
     plt.figure()
-    plt.xlabel('N')
+    plt.xlabel('Number of Agents')
     plt.ylabel('Reward Values')
     plt.plot(NVec, valueRewardMFCArray, label='MFC')
     plt.fill_between(NVec, valueRewardMFCArray - valueRewardMFCArraySD, valueRewardMFCArray + valueRewardMFCArraySD, alpha=0.3)
     plt.plot(NVec, valueRewardMARLArray, label='MARL')
     plt.fill_between(NVec, valueRewardMARLArray - valueRewardMARLArraySD, valueRewardMARLArray + valueRewardMARLArraySD, alpha=0.3)
     plt.legend()
-    plt.savefig(f'Results/RewardValues.png')
+    plt.savefig(f'Results/RewardValues{args.sigma}.png')
 
     plt.figure()
-    plt.xlabel('N')
+    plt.xlabel('Number of Agents')
     plt.ylabel('Percentage Error')
     plt.plot(NVec, percentRewardErrorArray)
     plt.fill_between(NVec, percentRewardErrorArray - percentRewardErrorArraySD, percentRewardErrorArray + percentRewardErrorArraySD, alpha=0.3)
@@ -77,4 +87,4 @@ if __name__ == '__main__':
 
     t1 = time.time()
 
-    print(f'Elapsed time is {t1-t0} sec')
+    args.logger.info(f'Elapsed time is {t1-t0} sec')
